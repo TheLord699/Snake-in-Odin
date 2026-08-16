@@ -28,6 +28,7 @@ board: Board
 init::proc() {
     board.width = 20
     board.height = 15
+
     board.cells = make([]Cell, board.width * board.height)
     
     for i in 0..<len(board.cells) {
@@ -91,32 +92,5 @@ render::proc() {
                 rl.Color{65, 65, 65, 255},
             )
         }
-    }
-}
-
-get_xy_from_index::proc(index: int) -> (x, y: int) {
-    x = index % board.width
-    y = index / board.width
-    return
-}
-
-get_index::proc(x, y: int) -> int {
-    return y * board.width + x
-}
-
-print::proc() {
-    for y in 0..<board.height {
-        for x in 0..<board.width {
-            cell := board.cells[y * board.width + x]
-            char: u8
-            switch cell {
-                case .EMPTY: char = '.'
-                case .WALL:  char = '#'
-                case .SNAKE: char = 'S'
-                case .FOOD:  char = 'F'
-            }
-            fmt.printf("%c", char)
-        }
-        fmt.println()
     }
 }

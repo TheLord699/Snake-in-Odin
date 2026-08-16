@@ -21,9 +21,12 @@ MOVE_DELAY :: 0.2
 
 init::proc() {
     snake.length = 1
+    
     snake.direction = {1, 0}
     snake.next_direction = {1, 0}
+
     move_timer = 0
+
     snake.dead = false
     snake.growing = false
     
