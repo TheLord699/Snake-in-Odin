@@ -1,0 +1,1 @@
+A simple snake project, programmed within the Odin langauge, this is my first odin project so Im starting with something more basic
