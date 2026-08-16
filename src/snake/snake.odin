@@ -50,13 +50,13 @@ update::proc() {
     }
     
     if rl.IsKeyPressed(.W) || rl.IsKeyPressed(.UP) {
-        if snake.direction != {0, 1} {
-            snake.next_direction = {0, -1}
+        if snake.direction != {0, -1} {
+            snake.next_direction = {0, 1}
         }
     }
     if rl.IsKeyPressed(.S) || rl.IsKeyPressed(.DOWN) {
-        if snake.direction != {0, -1} {
-            snake.next_direction = {0, 1}
+        if snake.direction != {0, 1} {
+            snake.next_direction = {0, -1}
         }
     }
     if rl.IsKeyPressed(.A) || rl.IsKeyPressed(.LEFT) {
