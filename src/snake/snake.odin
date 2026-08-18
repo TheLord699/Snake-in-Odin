@@ -10,7 +10,6 @@ Segment :: struct {
 snake: struct {
     body: [dynamic]Segment,
     direction: [2]int,
-    length: int,
     dead: bool,
     growing: bool,
     next_direction: [2]int,
@@ -19,31 +18,16 @@ snake: struct {
 move_timer: f32 = 0
 MOVE_DELAY :: 0.2
 
-init::proc() {
-    snake.length = 1
-    
-    snake.direction = {1, 0}
-    snake.next_direction = {1, 0}
-
-    move_timer = 0
-
-    snake.dead = false
-    snake.growing = false
-    
-    start_x := board.board.width / 2
-    start_y := board.board.height / 2
-    
+init :: proc() {
     snake.body = make([dynamic]Segment)
-    append(&snake.body, Segment{start_x, start_y})
-    
-    board.set_cell(start_x, start_y, .SNAKE)
+    reset()
 }
 
-destroy::proc() {
+destroy :: proc() {
     delete(snake.body)
 }
 
-update::proc() {
+update :: proc() {
     if snake.dead {
         if rl.IsKeyPressed(.R) {
             board.reset_food()
@@ -112,7 +96,6 @@ update::proc() {
     
     if cell == .FOOD {
         snake.growing = true
-        snake.length += 1
         board.remove_food()
         board.spawn_food()
     }
@@ -136,16 +119,15 @@ update::proc() {
     board.set_cell(new_head.x, new_head.y, .SNAKE)
 }
 
-is_dead::proc() -> bool {
+is_dead :: proc() -> bool {
     return snake.dead
 }
 
-reset::proc() {
+reset :: proc() {
     for seg in snake.body {
         board.set_cell(seg.x, seg.y, .EMPTY)
     }
     
-    snake.length = 1
     snake.direction = {1, 0}
     snake.next_direction = {1, 0}
     snake.dead = false
