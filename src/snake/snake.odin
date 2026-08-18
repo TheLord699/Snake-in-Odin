@@ -20,6 +20,7 @@ snake: struct {
 
 move_timer: f32 = 0
 
+CELL_SIZE::f32(40)
 INITIAL_SNAKE_LENGTH:: 2
 MOVE_DELAY::0.2
 
@@ -201,65 +202,44 @@ reset::proc() {
     )
 }
 
-render::proc() {
-    CELL_SIZE::f32(40)
+direction_to::proc(from, to: Segment) -> [2]int {
+    return {to.x - from.x, to.y - from.y}
+}
 
+segment_pos::proc(seg: Segment) -> (x, y: f32) {
+    return f32(seg.x) * CELL_SIZE, f32(seg.y) * CELL_SIZE
+}
+
+render::proc() {
     if len(snake.body) == 0 {
         return
     }
 
+    tail_index := len(snake.body) - 1
+
     for i in 0..<len(snake.body) {
         seg := snake.body[i]
+        x, y := segment_pos(seg)
 
-        x := f32(seg.x) * CELL_SIZE
-        y := f32(seg.y) * CELL_SIZE
+        switch i {
+        case 0:
+            sprite.draw_snake_head(snake.direction, x, y)
 
-        if i == 0 {
-            sprite.draw_snake_head(
-                snake.direction,
-                x,
-                y,
-            )
-
-            continue
-        }
-
-        if i == len(snake.body) - 1 {
+        case tail_index:
             previous := snake.body[i - 1]
+            sprite.draw_snake_tail(direction_to(previous, seg), x, y)
 
-            tail_direction := [2]int{
-                seg.x - previous.x,
-                seg.y - previous.y,
-            }
+        case:
+            previous := snake.body[i - 1]
+            next := snake.body[i + 1]
 
-            sprite.draw_snake_tail(
-                tail_direction,
+            sprite.draw_snake_body(
+                direction_to(seg, previous),
+                direction_to(seg, next),
                 x,
                 y,
             )
-
-            continue
         }
-
-        previous := snake.body[i - 1]
-        next := snake.body[i + 1]
-
-        prev_dir := [2]int{
-            previous.x - seg.x,
-            previous.y - seg.y,
-        }
-
-        next_dir := [2]int{
-            next.x - seg.x,
-            next.y - seg.y,
-        }
-
-        sprite.draw_snake_body(
-            prev_dir,
-            next_dir,
-            x,
-            y,
-        )
     }
 }
 

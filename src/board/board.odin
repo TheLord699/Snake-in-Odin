@@ -16,6 +16,13 @@ Board::struct {
     cells: []Cell,
 }
 
+CELL_COLORS := [Cell]rl.Color{
+    .EMPTY = rl.DARKGRAY,
+    .WALL  = rl.GRAY,
+    .SNAKE = rl.DARKGRAY,
+    .FOOD  = rl.DARKGRAY,
+}
+
 board: Board
 
 init::proc() {
@@ -84,35 +91,9 @@ render::proc() {
                 f32(y) * CELL_SIZE,
             }
 
-            switch cell {
-            case .EMPTY:
-                rl.DrawRectangleV(
-                    pos,
-                    size_vec,
-                    rl.DARKGRAY,
-                )
+            rl.DrawRectangleV(pos, size_vec, CELL_COLORS[cell])
 
-            case .WALL:
-                rl.DrawRectangleV(
-                    pos,
-                    size_vec,
-                    rl.GRAY,
-                )
-
-            case .SNAKE:
-                rl.DrawRectangleV(
-                    pos,
-                    size_vec,
-                    rl.DARKGRAY,
-                )
-
-            case .FOOD:
-                rl.DrawRectangleV(
-                    pos,
-                    size_vec,
-                    rl.DARKGRAY,
-                )
-
+            if cell == .FOOD {
                 sprite.draw_apple(pos.x, pos.y)
             }
 
