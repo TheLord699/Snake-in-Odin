@@ -11,7 +11,6 @@ render_texture: rl.RenderTexture2D
 
 init::proc(){
     rl.InitAudioDevice()
-    sounds.init()
 
     screen_width: i32 = 800
     screen_height: i32 = 600
@@ -45,7 +44,8 @@ destroy::proc(){
     rl.CloseWindow()
 }
 
-init_objects::proc(){   
+init_objects::proc(){  
+    sounds.init() 
     sprite.init()
     board.init()
     snake.init()
