@@ -3,7 +3,7 @@ package snake
 import rl "vendor:raylib"
 import "../board"
 
-Segment :: struct {
+Segment::struct {
     x, y: int,
 }
 
@@ -18,24 +18,27 @@ snake: struct {
 move_timer: f32 = 0
 MOVE_DELAY :: 0.2
 
-init :: proc() {
+init::proc() {
     snake.body = make([dynamic]Segment)
     reset()
 }
 
-destroy :: proc() {
+destroy::proc() {
     delete(snake.body)
 }
 
-update :: proc() {
+handle_death::proc() {
     if snake.dead {
         if rl.IsKeyPressed(.R) {
             board.reset_food()
             reset()
         }
-        return
     }
-    
+}
+
+handle_input::proc() {
+    if snake.dead do return
+
     if rl.IsKeyPressed(.W) || rl.IsKeyPressed(.UP) {
         if snake.direction != {0, -1} {
             snake.next_direction = {0, 1}
@@ -56,13 +59,21 @@ update :: proc() {
             snake.next_direction = {1, 0}
         }
     }
-    
+}
+
+update_timer::proc() {
+    if snake.dead do return
     move_timer += rl.GetFrameTime()
-    if move_timer < MOVE_DELAY {
-        return
-    }
+}
+
+try_move::proc() {
+    if snake.dead do return
+    if move_timer < MOVE_DELAY do return
     move_timer = 0
-    
+    move_snake()
+}
+
+move_snake::proc() {
     snake.direction = snake.next_direction
     
     head := snake.body[0]
@@ -119,11 +130,11 @@ update :: proc() {
     board.set_cell(new_head.x, new_head.y, .SNAKE)
 }
 
-is_dead :: proc() -> bool {
+is_dead::proc() -> bool {
     return snake.dead
 }
 
-reset :: proc() {
+reset::proc() {
     for seg in snake.body {
         board.set_cell(seg.x, seg.y, .EMPTY)
     }
@@ -141,4 +152,11 @@ reset :: proc() {
     append(&snake.body, Segment{start_x, start_y})
     
     board.set_cell(start_x, start_y, .SNAKE)
+}
+
+update::proc() {
+    handle_death()
+    handle_input()
+    update_timer()
+    try_move()
 }
