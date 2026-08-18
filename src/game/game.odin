@@ -27,7 +27,7 @@ init::proc(){
         rl.UnloadImage(icon)
     }
     
-    render_texture = rl.LoadRenderTexture(800, 600)
+    render_texture = rl.LoadRenderTexture(screen_width, screen_height)
 
     init_objects()
     context_init()
