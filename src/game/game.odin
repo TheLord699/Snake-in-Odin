@@ -4,11 +4,15 @@ import "core:fmt"
 import rl "vendor:raylib"
 import "../board"
 import "../snake"
+import "../sounds"
 
 fps::60
 render_texture: rl.RenderTexture2D
 
 init::proc(){
+    rl.InitAudioDevice()
+    sounds.init()
+
     screen_width: i32 = 800
     screen_height: i32 = 600
 
@@ -20,6 +24,15 @@ init::proc(){
 
     init_objects()
     game_loop()
+}
+
+destroy::proc(){
+    sounds.destroy()
+    rl.CloseAudioDevice()
+    board.destroy()
+    snake.destroy()
+    rl.UnloadRenderTexture(render_texture)
+    rl.CloseWindow()
 }
 
 init_objects::proc(){   
@@ -51,4 +64,5 @@ game_loop::proc(){
         render()
         rl.EndDrawing()
     }
+    destroy()
 }

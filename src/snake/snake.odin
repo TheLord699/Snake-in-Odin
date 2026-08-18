@@ -2,6 +2,7 @@ package snake
 
 import rl "vendor:raylib"
 import "../board"
+import "../sounds"
 
 Segment::struct {
     x, y: int,
@@ -82,6 +83,7 @@ move_snake::proc() {
     
     if !board.is_valid_pos(new_head.x, new_head.y) {
         snake.dead = true
+        sounds.play_death()
         return
     }
     
@@ -89,6 +91,7 @@ move_snake::proc() {
     
     if cell == .WALL {
         snake.dead = true
+        sounds.play_death()
         return
     }
     
@@ -99,12 +102,14 @@ move_snake::proc() {
         }
         if snake.body[i].x == new_head.x && snake.body[i].y == new_head.y {
             snake.dead = true
+            sounds.play_death()
             return
         }
     }
     
     if cell == .FOOD {
         snake.growing = true
+        sounds.play_eat()
         board.remove_food()
         board.spawn_food()
     }
@@ -133,6 +138,8 @@ is_dead::proc() -> bool {
 }
 
 reset::proc() {
+    sounds.stop_all()
+    
     for seg in snake.body {
         board.set_cell(seg.x, seg.y, .EMPTY)
     }
