@@ -18,9 +18,9 @@ Board::struct {
 
 CELL_COLORS := [Cell]rl.Color{
     .EMPTY = rl.DARKGRAY,
-    .WALL  = rl.GRAY,
+    .WALL = rl.GRAY,
     .SNAKE = rl.DARKGRAY,
-    .FOOD  = rl.DARKGRAY,
+    .FOOD = rl.DARKGRAY,
 }
 
 board: Board

@@ -36,8 +36,8 @@ die::proc() {
     if snake.dead do return
     
     snake.dead = true
-    sounds.play_death()
     sounds.stop_theme()
+    sounds.play_death()
 }
 
 handle_death::proc() {
@@ -97,7 +97,6 @@ move_snake::proc() {
         head.y + snake.direction[1],
     }
 
-    // Check boundaries
     if !board.is_valid_pos(new_head.x, new_head.y) {
         die()
         return
