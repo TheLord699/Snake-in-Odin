@@ -9,32 +9,28 @@ food: struct {
 }
 
 spawn_food::proc() {
-    empty_count := 0
+    empty_cells: [dynamic]struct{x, y: int}
+    defer delete(empty_cells)
+    
     for y in 0..<board.height {
         for x in 0..<board.width {
             if board.cells[y * board.width + x] == .EMPTY {
-                empty_count += 1
+                append(&empty_cells, struct{x, y: int}{x, y})
             }
         }
     }
     
-    if empty_count == 0 {
+    if len(empty_cells) == 0 {
         return
     }
     
-    for {
-        x := rl.GetRandomValue(0, i32(board.width - 1))
-        y := rl.GetRandomValue(0, i32(board.height - 1))
-        
-        cell := get_cell(int(x), int(y))
-        if cell == .EMPTY {
-            food.x = int(x)
-            food.y = int(y)
-            food.active = true
-            set_cell(int(x), int(y), .FOOD)
-            return
-        }
-    }
+    index := rl.GetRandomValue(0, i32(len(empty_cells) - 1))
+    pos := empty_cells[index]
+    
+    food.x = pos.x
+    food.y = pos.y
+    food.active = true
+    set_cell(pos.x, pos.y, .FOOD)
 }
 
 remove_food::proc() {
