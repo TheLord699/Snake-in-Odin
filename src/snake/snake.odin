@@ -155,10 +155,6 @@ move_snake::proc() {
     }
 }
 
-is_dead::proc() -> bool {
-    return snake.dead
-}
-
 reset::proc() {
     sounds.stop_all()
     sounds.restart_theme()
