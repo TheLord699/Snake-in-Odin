@@ -23,10 +23,12 @@ init::proc(){
     render_texture = rl.LoadRenderTexture(800, 600)
 
     init_objects()
+    context_init()
     game_loop()
 }
 
 destroy::proc(){
+    context_destroy()
     sounds.destroy()
     sprite.destroy()
     rl.CloseAudioDevice()
@@ -56,6 +58,7 @@ render::proc(){
 }
 
 update::proc(){
+    context_update()
     snake.update()
 }
 

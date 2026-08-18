@@ -17,7 +17,6 @@ snake: struct {
     next_direction: [2]int,
 }
 
-
 move_timer: f32 = 0
 
 CELL_SIZE::f32(40)
@@ -33,10 +32,17 @@ destroy::proc() {
     delete(snake.body)
 }
 
+die::proc() {
+    if snake.dead do return
+    
+    snake.dead = true
+    sounds.play_death()
+    sounds.stop_theme()
+}
+
 handle_death::proc() {
     if snake.dead {
         if rl.IsKeyPressed(.R) {
-            board.reset_food()
             reset()
         }
     }
@@ -70,7 +76,6 @@ handle_input::proc() {
 
 update_timer::proc() {
     if snake.dead do return
-
     move_timer += rl.GetFrameTime()
 }
 
@@ -92,20 +97,16 @@ move_snake::proc() {
         head.y + snake.direction[1],
     }
 
+    // Check boundaries
     if !board.is_valid_pos(new_head.x, new_head.y) {
-        snake.dead = true
-        sounds.play_death()
+        die()
         return
     }
 
-    cell := board.get_cell(
-        new_head.x,
-        new_head.y,
-    )
+    cell := board.get_cell(new_head.x, new_head.y)
 
     if cell == .WALL {
-        snake.dead = true
-        sounds.play_death()
+        die()
         return
     }
 
@@ -118,29 +119,23 @@ move_snake::proc() {
 
         if snake.body[i].x == new_head.x &&
            snake.body[i].y == new_head.y {
-            snake.dead = true
-            sounds.play_death()
+            die()
             return
         }
     }
 
-    if cell == .FOOD {
+    ate_food := cell == .FOOD
+
+    if ate_food {
         snake.growing = true
-
         sounds.play_eat()
-
         board.remove_food()
-        board.spawn_food()
     }
 
     old_tail := snake.body[tail_index]
 
     if !snake.growing {
-        board.set_cell(
-            old_tail.x,
-            old_tail.y,
-            .EMPTY,
-        )
+        board.set_cell(old_tail.x, old_tail.y, .EMPTY)
     }
 
     for i := len(snake.body) - 1; i > 0; i -= 1 {
@@ -154,11 +149,11 @@ move_snake::proc() {
         snake.growing = false
     }
 
-    board.set_cell(
-        new_head.x,
-        new_head.y,
-        .SNAKE,
-    )
+    board.set_cell(new_head.x, new_head.y, .SNAKE)
+
+    if ate_food {
+        board.spawn_food()
+    }
 }
 
 is_dead::proc() -> bool {
@@ -167,20 +162,18 @@ is_dead::proc() -> bool {
 
 reset::proc() {
     sounds.stop_all()
+    sounds.restart_theme()
 
     for seg in snake.body {
-        board.set_cell(
-            seg.x,
-            seg.y,
-            .EMPTY,
-        )
+        board.set_cell(seg.x, seg.y, .EMPTY)
     }
+
+    board.remove_food()
 
     snake.direction = {1, 0}
     snake.next_direction = {1, 0}
     snake.dead = false
     snake.growing = false
-
     move_timer = 0
 
     clear(&snake.body)
@@ -189,17 +182,14 @@ reset::proc() {
     start_y := board.board.height / 2
 
     for i in 0..<INITIAL_SNAKE_LENGTH {
-        append(
-            &snake.body,
-            Segment{start_x - i, start_y},
-        )
+        append(&snake.body, Segment{start_x - i, start_y})
     }
 
-    board.set_cell(
-        start_x,
-        start_y,
-        .SNAKE,
-    )
+    for seg in snake.body {
+        board.set_cell(seg.x, seg.y, .SNAKE)
+    }
+
+    board.spawn_food()
 }
 
 direction_to::proc(from, to: Segment) -> [2]int {
