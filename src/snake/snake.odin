@@ -39,22 +39,20 @@ handle_death::proc() {
 handle_input::proc() {
     if snake.dead do return
 
-    if rl.IsKeyPressed(.W) || rl.IsKeyPressed(.UP) {
+    switch {
+    case rl.IsKeyPressed(.W), rl.IsKeyPressed(.UP):
         if snake.direction != {0, -1} {
             snake.next_direction = {0, 1}
         }
-    }
-    if rl.IsKeyPressed(.S) || rl.IsKeyPressed(.DOWN) {
+    case rl.IsKeyPressed(.S), rl.IsKeyPressed(.DOWN):
         if snake.direction != {0, 1} {
             snake.next_direction = {0, -1}
         }
-    }
-    if rl.IsKeyPressed(.A) || rl.IsKeyPressed(.LEFT) {
+    case rl.IsKeyPressed(.A), rl.IsKeyPressed(.LEFT):
         if snake.direction != {1, 0} {
             snake.next_direction = {-1, 0}
         }
-    }
-    if rl.IsKeyPressed(.D) || rl.IsKeyPressed(.RIGHT) {
+    case rl.IsKeyPressed(.D), rl.IsKeyPressed(.RIGHT):
         if snake.direction != {-1, 0} {
             snake.next_direction = {1, 0}
         }
