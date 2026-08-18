@@ -19,6 +19,12 @@ init::proc(){
     rl.SetTargetFPS(fps)
     rl.InitWindow(screen_width, screen_height, "Snake Game")
     rl.SetWindowState({.WINDOW_RESIZABLE})
+
+    icon := rl.LoadImage("../assets/snakeico.ico")
+    if icon.data != nil {
+        rl.SetWindowIcon(icon)
+        rl.UnloadImage(icon)
+    }
     
     render_texture = rl.LoadRenderTexture(800, 600)
 
