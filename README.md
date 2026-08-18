@@ -15,10 +15,6 @@ I've made optimisations such as representing the board using a 1D array.
 - **WASD / Arrow Keys** - Move the snake
 - **R** - Restart after death
 
-## Note
-
-will make this README more professional later 
-
 ## Building
 
 ```bash
