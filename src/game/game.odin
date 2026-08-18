@@ -6,7 +6,7 @@ import "../snake"
 import "../sounds"
 import "../sprite"
 
-fps::60
+FPS::60
 render_texture: rl.RenderTexture2D
 
 init::proc(){
@@ -16,7 +16,7 @@ init::proc(){
     screen_width: i32 = 800
     screen_height: i32 = 600
 
-    rl.SetTargetFPS(fps)
+    rl.SetTargetFPS(FPS)
     rl.InitWindow(screen_width, screen_height, "Snake Game")
     rl.SetWindowState({.WINDOW_RESIZABLE})
 
