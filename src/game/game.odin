@@ -20,8 +20,9 @@ init::proc(){
     rl.InitWindow(screen_width, screen_height, "Snake Game")
     rl.SetWindowState({.WINDOW_RESIZABLE})
 
-    icon := rl.LoadImage("../assets/snakeico.ico")
+    icon := rl.LoadImage("../assets/icon.png")
     if icon.data != nil {
+        rl.ImageFormat(&icon, .UNCOMPRESSED_R8G8B8A8)
         rl.SetWindowIcon(icon)
         rl.UnloadImage(icon)
     }
