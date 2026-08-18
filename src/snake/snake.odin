@@ -3,6 +3,7 @@ package snake
 import rl "vendor:raylib"
 import "../board"
 import "../sounds"
+import "../sprite"
 
 Segment::struct {
     x, y: int,
@@ -16,8 +17,11 @@ snake: struct {
     next_direction: [2]int,
 }
 
+
 move_timer: f32 = 0
-MOVE_DELAY :: 0.2
+
+INITIAL_SNAKE_LENGTH:: 2
+MOVE_DELAY::0.2
 
 init::proc() {
     snake.body = make([dynamic]Segment)
@@ -45,14 +49,17 @@ handle_input::proc() {
         if snake.direction != {0, -1} {
             snake.next_direction = {0, 1}
         }
+
     case rl.IsKeyPressed(.S), rl.IsKeyPressed(.DOWN):
         if snake.direction != {0, 1} {
             snake.next_direction = {0, -1}
         }
+
     case rl.IsKeyPressed(.A), rl.IsKeyPressed(.LEFT):
         if snake.direction != {1, 0} {
             snake.next_direction = {-1, 0}
         }
+
     case rl.IsKeyPressed(.D), rl.IsKeyPressed(.RIGHT):
         if snake.direction != {-1, 0} {
             snake.next_direction = {1, 0}
@@ -62,75 +69,95 @@ handle_input::proc() {
 
 update_timer::proc() {
     if snake.dead do return
+
     move_timer += rl.GetFrameTime()
 }
 
 try_move::proc() {
     if snake.dead do return
     if move_timer < MOVE_DELAY do return
+
     move_timer = 0
     move_snake()
 }
 
 move_snake::proc() {
     snake.direction = snake.next_direction
-    
+
     head := snake.body[0]
+
     new_head := Segment{
         head.x + snake.direction[0],
         head.y + snake.direction[1],
     }
-    
+
     if !board.is_valid_pos(new_head.x, new_head.y) {
         snake.dead = true
         sounds.play_death()
         return
     }
-    
-    cell := board.get_cell(new_head.x, new_head.y)
-    
+
+    cell := board.get_cell(
+        new_head.x,
+        new_head.y,
+    )
+
     if cell == .WALL {
         snake.dead = true
         sounds.play_death()
         return
     }
-    
+
     tail_index := len(snake.body) - 1
+
     for i in 0..<len(snake.body) {
         if !snake.growing && i == tail_index {
             continue
         }
-        if snake.body[i].x == new_head.x && snake.body[i].y == new_head.y {
+
+        if snake.body[i].x == new_head.x &&
+           snake.body[i].y == new_head.y {
             snake.dead = true
             sounds.play_death()
             return
         }
     }
-    
+
     if cell == .FOOD {
         snake.growing = true
+
         sounds.play_eat()
+
         board.remove_food()
         board.spawn_food()
     }
-    
+
     old_tail := snake.body[tail_index]
-    
+
     if !snake.growing {
-        board.set_cell(old_tail.x, old_tail.y, .EMPTY)
+        board.set_cell(
+            old_tail.x,
+            old_tail.y,
+            .EMPTY,
+        )
     }
-    
+
     for i := len(snake.body) - 1; i > 0; i -= 1 {
         snake.body[i] = snake.body[i - 1]
     }
+
     snake.body[0] = new_head
-    
+
     if snake.growing {
         append(&snake.body, old_tail)
         snake.growing = false
     }
-    
-    board.set_cell(new_head.x, new_head.y, .SNAKE)
+
+    board.set_cell(
+        new_head.x,
+        new_head.y,
+        .SNAKE,
+    )
 }
 
 is_dead::proc() -> bool {
@@ -139,24 +166,101 @@ is_dead::proc() -> bool {
 
 reset::proc() {
     sounds.stop_all()
-    
+
     for seg in snake.body {
-        board.set_cell(seg.x, seg.y, .EMPTY)
+        board.set_cell(
+            seg.x,
+            seg.y,
+            .EMPTY,
+        )
     }
-    
+
     snake.direction = {1, 0}
     snake.next_direction = {1, 0}
     snake.dead = false
     snake.growing = false
+
     move_timer = 0
-    
+
     clear(&snake.body)
-    
+
     start_x := board.board.width / 2
     start_y := board.board.height / 2
-    append(&snake.body, Segment{start_x, start_y})
-    
-    board.set_cell(start_x, start_y, .SNAKE)
+
+    for i in 0..<INITIAL_SNAKE_LENGTH {
+        append(
+            &snake.body,
+            Segment{start_x - i, start_y},
+        )
+    }
+
+    board.set_cell(
+        start_x,
+        start_y,
+        .SNAKE,
+    )
+}
+
+render::proc() {
+    CELL_SIZE::f32(40)
+
+    if len(snake.body) == 0 {
+        return
+    }
+
+    for i in 0..<len(snake.body) {
+        seg := snake.body[i]
+
+        x := f32(seg.x) * CELL_SIZE
+        y := f32(seg.y) * CELL_SIZE
+
+        if i == 0 {
+            sprite.draw_snake_head(
+                snake.direction,
+                x,
+                y,
+            )
+
+            continue
+        }
+
+        if i == len(snake.body) - 1 {
+            previous := snake.body[i - 1]
+
+            tail_direction := [2]int{
+                seg.x - previous.x,
+                seg.y - previous.y,
+            }
+
+            sprite.draw_snake_tail(
+                tail_direction,
+                x,
+                y,
+            )
+
+            continue
+        }
+
+        previous := snake.body[i - 1]
+        next := snake.body[i + 1]
+
+        prev_dir := [2]int{
+            previous.x - seg.x,
+            previous.y - seg.y,
+        }
+
+        next_dir := [2]int{
+            next.x - seg.x,
+            next.y - seg.y,
+        }
+
+        sprite.draw_snake_body(
+            prev_dir,
+            next_dir,
+            x,
+            y,
+        )
+    }
 }
 
 update::proc() {

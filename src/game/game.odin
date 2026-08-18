@@ -1,10 +1,10 @@
 package game
 
-import "core:fmt"
 import rl "vendor:raylib"
 import "../board"
 import "../snake"
 import "../sounds"
+import "../sprite"
 
 fps::60
 render_texture: rl.RenderTexture2D
@@ -28,6 +28,7 @@ init::proc(){
 
 destroy::proc(){
     sounds.destroy()
+    sprite.destroy()
     rl.CloseAudioDevice()
     board.destroy()
     snake.destroy()
@@ -36,14 +37,16 @@ destroy::proc(){
 }
 
 init_objects::proc(){   
+    sprite.init()
     board.init()
     snake.init()
 }
 
 render::proc(){
     rl.BeginTextureMode(render_texture)
-    rl.ClearBackground(rl.BLACK)
+    rl.ClearBackground(rl.Color{72, 112, 75, 255})
     board.render()
+    snake.render()
     rl.EndTextureMode()
     
     src := rl.Rectangle{0, 0, 800, 600}
